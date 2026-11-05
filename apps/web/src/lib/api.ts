@@ -1,7 +1,7 @@
 import { ApiClient, RealtimeClient } from '@stock-market/api-client';
 
-const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001/api/v1';
-const WS_BASE = import.meta.env.VITE_WS_BASE_URL || 'http://localhost:5001';
+const API_BASE = import.meta.env.VITE_API_BASE_URL || 'https://stock-market-api-1wo1.onrender.com/api/v1';
+const WS_BASE = import.meta.env.VITE_WS_BASE_URL || 'https://stock-market-api-1wo1.onrender.com';
 
 export const api = new ApiClient({
   baseUrl: API_BASE,
