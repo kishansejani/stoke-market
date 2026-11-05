@@ -25,6 +25,7 @@ import {
   License,
   LicenseValidationResult,
   MarketTick,
+  IPOItem,
 } from '@stock-market/shared-types';
 
 export interface ApiResponse<T> {
@@ -210,6 +211,14 @@ export class ApiClient {
     const params = new URLSearchParams({ limit: String(limit) });
     if (market) params.append('market', market);
     return this.request<NewsArticle[]>(`/news?${params.toString()}`);
+  }
+
+  // IPOs
+  async getIPOs(market?: 'IN' | 'US', status?: string): Promise<IPOItem[]> {
+    const params = new URLSearchParams();
+    if (market) params.append('market', market);
+    if (status) params.append('status', status);
+    return this.request<IPOItem[]>(`/ipos?${params.toString()}`);
   }
 
   // Products, Orders & Licenses

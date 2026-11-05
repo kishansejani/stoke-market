@@ -21,20 +21,24 @@ export interface MarketSessionStatus {
  */
 export function getMarketSessionStatus(marketId: MarketId, now = new Date()): MarketSessionStatus {
   if (marketId === 'IN') {
-    // Convert to IST
-    const istOffset = 5.5 * 60; // minutes
-    const utcMinutes = now.getTime() + now.getTimezoneOffset() * 60000;
-    const istTime = new Date(utcMinutes + istOffset * 60000);
+    const formatter = new Intl.DateTimeFormat('en-US', {
+      timeZone: 'Asia/Kolkata',
+      hour: 'numeric',
+      minute: 'numeric',
+      hour12: false,
+      weekday: 'short',
+    });
 
-    const day = istTime.getUTCDay(); // 0 is Sunday, 6 is Saturday
-    const hours = istTime.getUTCHours();
-    const minutes = istTime.getUTCMinutes();
-    const timeInMinutes = hours * 60 + minutes;
+    const parts = formatter.formatToParts(now);
+    const dayPart = parts.find((p) => p.type === 'weekday')?.value;
+    const hourPart = Number(parts.find((p) => p.type === 'hour')?.value || '0');
+    const minPart = Number(parts.find((p) => p.type === 'minute')?.value || '0');
+    const timeInMinutes = hourPart * 60 + minPart;
 
-    const timeStr = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')} IST`;
+    const timeStr = `${String(hourPart).padStart(2, '0')}:${String(minPart).padStart(2, '0')} IST`;
+    const isWeekend = dayPart === 'Sat' || dayPart === 'Sun';
 
-    // Weekend check
-    if (day === 0 || day === 6) {
+    if (isWeekend) {
       return {
         marketId: 'IN',
         status: 'CLOSED',

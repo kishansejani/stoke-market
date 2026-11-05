@@ -466,3 +466,35 @@ model AuditLog {
   @@map("audit_logs")
 }
 
+
+
+// ----------------- IPO MARKET INTELLIGENCE -----------------
+
+model IPO {
+  id                 String    @id @default(uuid())
+  symbol             String?
+  companyName        String
+  marketId           String    // "IN" or "US"
+  exchange           String    // "NSE", "BSE", "NASDAQ", "NYSE", "SME"
+  category           String    @default("MAINBOARD") // "MAINBOARD", "SME"
+  status             String    @default("UPCOMING")  // "UPCOMING", "ACTIVE", "CLOSED", "LISTED"
+  priceBandLow       Float
+  priceBandHigh      Float
+  lotSize            Int
+  issueSize          Float     // In Cr for INR, In Millions for USD
+  openDate           DateTime
+  closeDate          DateTime
+  allotmentDate      DateTime?
+  listingDate        DateTime?
+  gmpPrice           Float?    // Grey market premium
+  gmpPercent         Float?    // Expected gain %
+  expectedProfit     Float?    // Expected profit per lot
+  subscriptionQIB    Float?
+  subscriptionNII    Float?
+  subscriptionRetail Float?
+  subscriptionTotal  Float?
+  description        String?
+  createdAt          DateTime  @default(now())
+
+  @@map("ipos")
+}

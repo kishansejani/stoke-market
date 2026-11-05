@@ -8,7 +8,10 @@
     "apps/*"
   ],
   "scripts": {
-    "build": "npm run build --workspaces --if-present",
+    "build:packages": "npm --workspace=@stock-market/shared-types run build && npm --workspace=@stock-market/validation run build && npm --workspace=@stock-market/shared-utils run build && npm --workspace=@stock-market/design-tokens run build && npm --workspace=@stock-market/api-client run build",
+    "build:web": "npm run build:packages && npm --workspace=@stock-market/web run build",
+    "build:api": "npm run build:packages && npm --workspace=@stock-market/api run build",
+    "build": "npm run build:packages && npm --workspace=@stock-market/api run build && npm --workspace=@stock-market/web run build",
     "test": "npm run test --workspaces --if-present",
     "lint": "npm run lint --workspaces --if-present",
     "dev:api": "npm --workspace=@stock-market/api run dev",

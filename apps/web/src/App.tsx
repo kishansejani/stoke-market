@@ -10,6 +10,7 @@ import { StockDetailPage } from './pages/StockDetailPage';
 import { ScreenerPage } from './pages/ScreenerPage';
 import { WatchlistPage } from './pages/WatchlistPage';
 import { MoversPage } from './pages/MoversPage';
+import { IpoPage } from './pages/IpoPage';
 import { NewsPage } from './pages/NewsPage';
 import { AlertsPage } from './pages/AlertsPage';
 import { StorePage } from './pages/StorePage';
@@ -56,6 +57,7 @@ export const App: React.FC = () => {
             <Route path="/screener" element={<ScreenerPage />} />
             <Route path="/watchlist" element={<WatchlistPage />} />
             <Route path="/movers" element={<MoversPage />} />
+            <Route path="/ipo" element={<IpoPage />} />
             <Route path="/news" element={<NewsPage />} />
             <Route path="/alerts" element={<AlertsPage />} />
             <Route path="/store" element={<StorePage />} />

@@ -1,5 +1,6 @@
 import { IMarketDataProvider } from './types';
 import { prisma } from '../models/prisma';
+import { getMarketSessionStatus } from '@stock-market/shared-utils';
 import {
   NormalizedQuote,
   Candle,
@@ -33,6 +34,7 @@ export class MockMarketDataProvider implements IMarketDataProvider {
     });
 
     for (const q of dbQuotes) {
+      const session = getMarketSessionStatus(q.instrument.marketId as any);
       this.cachedQuotes.set(q.instrument.symbol, {
         symbol: q.instrument.symbol,
         ticker: q.instrument.ticker,
@@ -53,6 +55,8 @@ export class MockMarketDataProvider implements IMarketDataProvider {
         marketCap: q.marketCap || undefined,
         peRatio: q.peRatio || undefined,
         isSimulated: true,
+        isMarketOpen: session.isOpen,
+        marketStatus: session.status,
         delayMinutes: 0,
         dataSource: 'SIMULATED DATA (DEV MOCK)',
         lastTradeAt: q.lastTradeAt.toISOString(),
@@ -72,6 +76,16 @@ export class MockMarketDataProvider implements IMarketDataProvider {
       for (const [symbol, listeners] of this.activeSubscriptions.entries()) {
         const quote = this.cachedQuotes.get(symbol);
         if (!quote) continue;
+
+        const session = getMarketSessionStatus(quote.market);
+        quote.isMarketOpen = session.isOpen;
+        quote.marketStatus = session.status;
+
+        // When the market is CLOSED or in PRE_MARKET, real-time trading ticks freeze!
+        // Stock prices freeze at last closing price until trading hours resume.
+        if (!session.isOpen) {
+          continue;
+        }
 
         // Realistic random walk (Geometric Brownian Motion tick)
         const volatility = 0.0015; // 0.15% max tick step
@@ -97,6 +111,8 @@ export class MockMarketDataProvider implements IMarketDataProvider {
           low: quote.low,
           volume: quote.volume,
           isSimulated: true,
+          isMarketOpen: session.isOpen,
+          marketStatus: session.status,
           timestamp: quote.lastTradeAt,
         };
 
@@ -110,7 +126,12 @@ export class MockMarketDataProvider implements IMarketDataProvider {
 
   async getQuote(symbol: string): Promise<NormalizedQuote | null> {
     const existing = this.cachedQuotes.get(symbol);
-    if (existing) return existing;
+    if (existing) {
+      const session = getMarketSessionStatus(existing.market);
+      existing.isMarketOpen = session.isOpen;
+      existing.marketStatus = session.status;
+      return existing;
+    }
 
     const inst = await prisma.instrument.findUnique({
       where: { symbol },
@@ -118,6 +139,8 @@ export class MockMarketDataProvider implements IMarketDataProvider {
     });
 
     if (!inst || !inst.quote) return null;
+
+    const session = getMarketSessionStatus(inst.marketId as any);
 
     const normalized: NormalizedQuote = {
       symbol: inst.symbol,
@@ -139,6 +162,8 @@ export class MockMarketDataProvider implements IMarketDataProvider {
       marketCap: inst.quote.marketCap || undefined,
       peRatio: inst.quote.peRatio || undefined,
       isSimulated: true,
+      isMarketOpen: session.isOpen,
+      marketStatus: session.status,
       delayMinutes: 0,
       dataSource: 'SIMULATED DATA (DEV MOCK)',
       lastTradeAt: inst.quote.lastTradeAt.toISOString(),

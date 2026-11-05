@@ -1,4 +1,4 @@
-import { ExchangeId, MarketId } from './market.js';
+import { ExchangeId, MarketId, MarketStatusType } from './market.js';
 
 export interface NormalizedQuote {
   symbol: string;
@@ -20,6 +20,8 @@ export interface NormalizedQuote {
   marketCap?: number;
   peRatio?: number;
   isSimulated: boolean;
+  isMarketOpen?: boolean;
+  marketStatus?: MarketStatusType;
   delayMinutes: number;
   dataSource: string;
   lastTradeAt: string;
@@ -47,5 +49,7 @@ export interface MarketTick {
   low: number;
   volume: number;
   isSimulated: boolean;
+  isMarketOpen?: boolean;
+  marketStatus?: MarketStatusType;
   timestamp: string;
 }

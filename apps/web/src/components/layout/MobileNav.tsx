@@ -1,6 +1,6 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
-import { LayoutDashboard, TrendingUp, Bookmark, Filter, Sparkles } from 'lucide-react';
+import { LayoutDashboard, TrendingUp, Bookmark, Rocket, Sparkles } from 'lucide-react';
 
 export const MobileNav: React.FC = () => {
   return (
@@ -30,6 +30,18 @@ export const MobileNav: React.FC = () => {
       </NavLink>
 
       <NavLink
+        to="/ipo"
+        className={({ isActive }) =>
+          `flex flex-col items-center justify-center space-y-1 py-1 px-3 rounded-lg text-[10px] font-medium transition-colors ${
+            isActive ? 'text-blue-400 font-semibold' : 'text-slate-400'
+          }`
+        }
+      >
+        <Rocket className="w-4 h-4" />
+        <span>IPO</span>
+      </NavLink>
+
+      <NavLink
         to="/watchlist"
         className={({ isActive }) =>
           `flex flex-col items-center justify-center space-y-1 py-1 px-3 rounded-lg text-[10px] font-medium transition-colors ${
@@ -39,18 +51,6 @@ export const MobileNav: React.FC = () => {
       >
         <Bookmark className="w-4 h-4" />
         <span>Watchlist</span>
-      </NavLink>
-
-      <NavLink
-        to="/screener"
-        className={({ isActive }) =>
-          `flex flex-col items-center justify-center space-y-1 py-1 px-3 rounded-lg text-[10px] font-medium transition-colors ${
-            isActive ? 'text-blue-400 font-semibold' : 'text-slate-400'
-          }`
-        }
-      >
-        <Filter className="w-4 h-4" />
-        <span>Screener</span>
       </NavLink>
 
       <NavLink

@@ -11,14 +11,18 @@ import {
   ShieldAlert,
   Flame,
   Newspaper,
+  Moon,
+  Sun,
+  AlertTriangle,
 } from 'lucide-react';
 import { api } from '../lib/api';
 import { useMarketStore } from '../store/marketStore';
-import { IndexSummary, MarketMovers, NewsArticle, NormalizedQuote } from '@stock-market/shared-types';
+import { IndexSummary, MarketMovers, NewsArticle, NormalizedQuote, MarketInfo } from '@stock-market/shared-types';
 import { formatCurrency, formatPercentage, formatVolume } from '@stock-market/shared-utils';
 
 export const DashboardPage: React.FC = () => {
   const { activeMarket, setActiveMarket, ticks, subscribeSymbol } = useMarketStore();
+  const [markets, setMarkets] = useState<MarketInfo[]>([]);
   const [indiaIndices, setIndiaIndices] = useState<IndexSummary[]>([]);
   const [usIndices, setUsIndices] = useState<IndexSummary[]>([]);
   const [movers, setMovers] = useState<MarketMovers | null>(null);
@@ -28,13 +32,15 @@ export const DashboardPage: React.FC = () => {
   useEffect(() => {
     async function loadData() {
       try {
-        const [inSum, usSum, mov, nws] = await Promise.all([
+        const [mkts, inSum, usSum, mov, nws] = await Promise.all([
+          api.getMarkets(),
           api.getMarketSummary('IN'),
           api.getMarketSummary('US'),
           api.getMarketMovers(activeMarket),
           api.getNews(activeMarket, 6),
         ]);
 
+        setMarkets(mkts);
         setIndiaIndices(inSum);
         setUsIndices(usSum);
         setMovers(mov);
@@ -54,6 +60,8 @@ export const DashboardPage: React.FC = () => {
   }, [activeMarket]);
 
   const activeIndices = activeMarket === 'IN' ? indiaIndices : usIndices;
+  const currentMarketInfo = markets.find((m) => m.id === activeMarket);
+  const isMarketOpen = currentMarketInfo?.status === 'OPEN';
 
   return (
     <div className="space-y-6 pb-12">
@@ -119,6 +127,53 @@ export const DashboardPage: React.FC = () => {
         </Link>
       </div>
 
+      {/* Dynamic Market Trading Session Notification Banner */}
+      {currentMarketInfo && (
+        <div
+          className={`p-3.5 rounded-xl border flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs transition-all ${
+            isMarketOpen
+              ? 'bg-emerald-500/10 border-emerald-500/25 text-emerald-300'
+              : currentMarketInfo.status === 'PRE_MARKET'
+              ? 'bg-amber-500/10 border-amber-500/25 text-amber-300'
+              : 'bg-rose-500/10 border-rose-500/20 text-rose-300'
+          }`}
+        >
+          <div className="flex items-center gap-2.5">
+            <span
+              className={`w-2.5 h-2.5 rounded-full ${
+                isMarketOpen
+                  ? 'bg-emerald-400 animate-pulse'
+                  : currentMarketInfo.status === 'PRE_MARKET'
+                  ? 'bg-amber-400 animate-pulse'
+                  : 'bg-rose-500'
+              }`}
+            />
+            <div>
+              <span className="font-bold uppercase tracking-wider mr-2 font-mono">
+                [{currentMarketInfo.id === 'IN' ? 'NSE & BSE INDIA' : 'US WALL STREET'} • {currentMarketInfo.status}]
+              </span>
+              <span>
+                {isMarketOpen
+                  ? `Trading session is live! Real-time ticks streaming (${currentMarketInfo.tradingHoursStart} - ${currentMarketInfo.tradingHoursEnd}).`
+                  : currentMarketInfo.status === 'PRE_MARKET'
+                  ? `Pre-market auction order session active. Regular trading starts at ${currentMarketInfo.tradingHoursStart}.`
+                  : `Market is currently CLOSED. Trading hours: ${currentMarketInfo.tradingHoursStart} - ${currentMarketInfo.tradingHoursEnd} (${currentMarketInfo.timezone}). Real-time quote ticks are paused until next bell.`}
+              </span>
+            </div>
+          </div>
+
+          {!isMarketOpen && activeMarket === 'IN' && (
+            <button
+              onClick={() => setActiveMarket('US')}
+              className="text-[11px] font-semibold text-blue-400 hover:text-blue-300 flex items-center gap-1 shrink-0 bg-[#0B1220]/60 px-3 py-1 rounded-lg border border-blue-500/30"
+            >
+              <span>Explore US Markets</span>
+              <ArrowRight className="w-3 h-3" />
+            </button>
+          )}
+        </div>
+      )}
+
       {/* Index Cards Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {activeIndices.map((idx) => {
@@ -167,10 +222,17 @@ export const DashboardPage: React.FC = () => {
 
               <div className="mt-3 pt-3 border-t border-[#1E293B]/70 flex items-center justify-between text-[10px] text-slate-400">
                 <span>Prev Close: {idx.previousClose?.toLocaleString()}</span>
-                <span className="text-emerald-400 flex items-center gap-1 font-mono">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping"></span>
-                  STREAMING
-                </span>
+                {isMarketOpen ? (
+                  <span className="text-emerald-400 flex items-center gap-1 font-mono">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping"></span>
+                    STREAMING
+                  </span>
+                ) : (
+                  <span className="text-slate-400 flex items-center gap-1 font-mono">
+                    <span className="w-1.5 h-1.5 rounded-full bg-slate-500"></span>
+                    CLOSED (FROZEN)
+                  </span>
+                )}
               </div>
             </Link>
           );

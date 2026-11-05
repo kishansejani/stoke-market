@@ -9,6 +9,7 @@ import { NewsController } from '../controllers/newsController';
 import { OrdersController } from '../controllers/ordersController';
 import { LicensesController } from '../controllers/licensesController';
 import { AdminController } from '../controllers/adminController';
+import { getIPOs, getIPOById } from '../controllers/iposController.js';
 import { authenticate, requireRole, optionalAuthenticate } from '../middlewares/auth';
 import { validate } from '../middlewares/validate';
 import {
@@ -82,6 +83,12 @@ const newsRouter = Router();
 newsRouter.get('/', NewsController.getNews);
 newsRouter.get('/symbol/:symbol', NewsController.getNewsBySymbol);
 apiRouter.use('/news', newsRouter);
+
+// ==================== IPOS ====================
+const iposRouter = Router();
+iposRouter.get('/', getIPOs);
+iposRouter.get('/:id', getIPOById);
+apiRouter.use('/ipos', iposRouter);
 
 // ==================== COMMERCE & ORDERS ====================
 const ordersRouter = Router();
