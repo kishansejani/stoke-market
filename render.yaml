@@ -1,3 +1,10 @@
+databases:
+  - name: stock-market-db
+    databaseName: stock_market
+    user: stock_user
+    plan: free
+    region: singapore
+
 services:
   - type: web
     name: stock-market-api
@@ -5,7 +12,7 @@ services:
     plan: free
     region: singapore
     buildCommand: npm run build:packages && npm --workspace=@stock-market/api run build
-    startCommand: npm --workspace=@stock-market/api run start
+    startCommand: npx prisma db push --schema=apps/api/prisma/schema.prisma && npx tsx apps/api/prisma/seed.ts && npm --workspace=@stock-market/api run start
     healthCheckPath: /health
     envVars:
       - key: NODE_ENV
@@ -15,10 +22,13 @@ services:
       - key: CORS_ORIGIN
         value: "*"
       - key: DATABASE_URL
-        sync: false
+        fromDatabase:
+          name: stock-market-db
+          property: connectionString
       - key: JWT_ACCESS_SECRET
         generateValue: true
       - key: JWT_REFRESH_SECRET
         generateValue: true
       - key: LICENSE_HMAC_SECRET
         generateValue: true
+
