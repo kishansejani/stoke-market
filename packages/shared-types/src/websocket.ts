@@ -1,5 +1,5 @@
-import { MarketTick } from './quote';
-import { MarketId, MarketStatusType } from './market';
+import { MarketTick } from './quote.js';
+import { MarketId, MarketStatusType } from './market.js';
 
 export interface WebSocketClientEvents {
   'subscribe:symbols': (data: { symbols: string[] }) => void;

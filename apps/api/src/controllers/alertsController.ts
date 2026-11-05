@@ -115,3 +115,4 @@ export class AlertsController {
     res.json({ success: true, data: updated });
   }
 }
+

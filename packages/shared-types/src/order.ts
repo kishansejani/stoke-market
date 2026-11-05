@@ -51,3 +51,4 @@ export interface PaymentVerificationRequest {
   paymentId: string;
   signature?: string;
 }
+

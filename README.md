@@ -136,3 +136,4 @@ Deploy with PostgreSQL, Redis, API, and Web Reverse Proxy in one command:
 docker-compose up --build -d
 ```
 Access the application on `http://localhost`.
+

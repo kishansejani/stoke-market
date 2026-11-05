@@ -237,3 +237,4 @@ export const ScreenerPage: React.FC = () => {
     </div>
   );
 };
+

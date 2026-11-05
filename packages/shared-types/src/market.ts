@@ -57,3 +57,4 @@ export interface IndexSummary {
   delayMinutes: number;
   lastUpdated: string;
 }
+

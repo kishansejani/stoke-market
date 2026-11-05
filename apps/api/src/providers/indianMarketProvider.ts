@@ -67,3 +67,4 @@ export class IndianMarketDataProvider implements IMarketDataProvider {
     return this.fallbackMock.subscribeRealtime(symbols, onTick);
   }
 }
+

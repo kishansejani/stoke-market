@@ -18,3 +18,4 @@ export class NewsController {
     res.json({ success: true, data: news });
   }
 }
+

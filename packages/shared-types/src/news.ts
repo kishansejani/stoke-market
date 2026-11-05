@@ -1,4 +1,4 @@
-import { MarketId } from './market';
+import { MarketId } from './market.js';
 
 export interface NewsArticle {
   id: string;

@@ -111,3 +111,4 @@ export const DeactivateLicenseSchema = z.object({
   licenseKey: z.string().trim().min(5),
   deviceId: z.string().trim().min(1),
 });
+

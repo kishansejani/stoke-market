@@ -70,3 +70,4 @@
 | Stripe Gateway | Global One-Time Checkout | `STRIPE_SECRET_KEY`, `WEBHOOK_SECRET` | Checkout session & Webhook adapter implemented |
 | PostgreSQL | Persistent Relational DB | `DATABASE_URL` | Prisma schema configured; ready for migration |
 | Redis | Real-time Pub/Sub & Caching | `REDIS_URL` | In-memory fallback supported for zero-friction local run |
+

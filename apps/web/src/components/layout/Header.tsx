@@ -220,3 +220,4 @@ export const Header: React.FC<HeaderProps> = ({ onOpenSearch, onToggleSidebar })
     </header>
   );
 };
+

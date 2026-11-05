@@ -1,5 +1,5 @@
-import { MarketId, ExchangeId } from './market';
-import { NormalizedQuote } from './quote';
+import { MarketId, ExchangeId } from './market.js';
+import { NormalizedQuote } from './quote.js';
 
 export interface ScreenerFilter {
   market?: MarketId;

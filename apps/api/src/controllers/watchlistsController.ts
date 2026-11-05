@@ -182,3 +182,4 @@ export class WatchlistsController {
     res.json({ success: true, message: 'Watchlist deleted' });
   }
 }
+

@@ -38,3 +38,4 @@ export interface FinancialStatements {
   annual: FinancialStatementPeriod[];
   quarterly: FinancialStatementPeriod[];
 }
+

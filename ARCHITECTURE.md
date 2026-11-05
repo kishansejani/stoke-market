@@ -189,3 +189,4 @@ To prevent high-bandwidth broadcast flooding:
    - The license includes 1 Year of included Real-time Data Connector Access via licensed aggregation gateways.
    - Users can either extend the data connector or configure their own personal broker/exchange API keys (Zerodha Kite, Upstox, Interactive Brokers, Alpaca, Polygon) for direct zero-margin real-time access.
 3. **License Keys**: Cryptographically signed HMAC-SHA256 tokens linked to machine/device fingerprints with configurable maximum concurrent activations.
+

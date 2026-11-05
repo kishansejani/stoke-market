@@ -162,3 +162,4 @@ Auth: Handshake query `{ token: "<JWT_ACCESS_TOKEN>" }` or anonymous public room
    - Payload: `{ market: "IN", status: "OPEN", serverTime: "2026-11-05T07:45:00.000Z" }`
 3. `alert:triggered`
    - Payload: `{ alertId: "...", symbol: "AAPL.US", targetPrice: 220, currentPrice: 221.50 }`
+

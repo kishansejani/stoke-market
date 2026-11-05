@@ -93,3 +93,4 @@ export class StocksController {
     res.json({ success: true, data: financials });
   }
 }
+

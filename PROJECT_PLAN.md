@@ -76,3 +76,4 @@ The system is built upon a **commercial one-time purchase license model** (with 
 - Production deployment guides (Render, AWS, DigitalOcean, Nginx).
 - Environment variable specifications.
 - Push to GitHub remote repository (`https://github.com/kishansejani/stoke-market.git`).
+

@@ -64,3 +64,4 @@ export class PolygonMarketDataProvider implements IMarketDataProvider {
     return this.fallbackMock.subscribeRealtime(symbols, onTick);
   }
 }
+

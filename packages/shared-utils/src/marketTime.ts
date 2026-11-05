@@ -154,3 +154,4 @@ export function getMarketSessionStatus(marketId: MarketId, now = new Date()): Ma
     };
   }
 }
+

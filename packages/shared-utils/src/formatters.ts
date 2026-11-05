@@ -87,3 +87,4 @@ export function formatVolume(volume: number | undefined | null): string {
   if (abs >= 1e3) return `${(volume / 1e3).toFixed(2)}K`;
   return volume.toLocaleString();
 }
+

@@ -109,3 +109,4 @@ adminRouter.get('/providers', AdminController.getProviders);
 adminRouter.post('/providers/switch', AdminController.switchProvider);
 adminRouter.get('/audit-logs', AdminController.getAuditLogs);
 apiRouter.use('/admin', adminRouter);
+

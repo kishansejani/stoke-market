@@ -216,3 +216,4 @@ erDiagram
 - **`market_news`**: `id`, `marketId`, `title`, `summary`, `content`, `source`, `url`, `publishedAt`, `sentiment` (`BULLISH`, `BEARISH`, `NEUTRAL`), `relatedSymbols` (TEXT[]).
 - **`data_providers`**: `id`, `name`, `code` (`MOCK`, `POLYGON`, `NSE_LICENSED`, `ALPHA_VANTAGE`), `isActive`, `status` (`ONLINE`, `DEGRADED`, `OFFLINE`), `latencyMs`, `quotaLimit`, `quotaUsed`.
 - **`audit_logs` & `admin_logs`**: `id`, `userId`, `action`, `resource`, `ipAddress`, `userAgent`, `payload`, `createdAt`.
+

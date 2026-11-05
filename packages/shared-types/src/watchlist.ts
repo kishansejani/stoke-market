@@ -1,4 +1,4 @@
-import { NormalizedQuote } from './quote';
+import { NormalizedQuote } from './quote.js';
 
 export interface WatchlistItem {
   id: string;

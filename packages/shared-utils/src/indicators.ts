@@ -220,3 +220,4 @@ export function calculateBollingerBands(
 
   return results;
 }
+

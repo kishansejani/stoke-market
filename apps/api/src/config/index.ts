@@ -22,3 +22,4 @@ export const config = {
   },
   marketProvider: process.env.MARKET_DATA_PROVIDER || 'MOCK',
 };
+

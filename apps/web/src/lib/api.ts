@@ -1,7 +1,7 @@
 import { ApiClient, RealtimeClient } from '@stock-market/api-client';
 
-const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api/v1';
-const WS_BASE = import.meta.env.VITE_WS_BASE_URL || 'http://localhost:5000';
+const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001/api/v1';
+const WS_BASE = import.meta.env.VITE_WS_BASE_URL || 'http://localhost:5001';
 
 export const api = new ApiClient({
   baseUrl: API_BASE,
@@ -15,7 +15,6 @@ export const api = new ApiClient({
     }
   },
   onAuthError: () => {
-    // Clear storage on invalid token
     localStorage.removeItem('stoke_access_token');
     localStorage.removeItem('stoke_refresh_token');
   },

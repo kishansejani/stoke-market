@@ -58,3 +58,4 @@ export class LicensesController {
     res.json({ success: true, message: 'Device slot successfully released' });
   }
 }
+

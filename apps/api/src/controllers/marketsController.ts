@@ -64,3 +64,4 @@ export class MarketsController {
     res.json({ success: true, data: exchanges });
   }
 }
+

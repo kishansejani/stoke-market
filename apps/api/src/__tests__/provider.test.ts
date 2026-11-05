@@ -48,3 +48,4 @@ describe('Market Data Provider Adapter & Normalization', () => {
     unsub();
   });
 });
+

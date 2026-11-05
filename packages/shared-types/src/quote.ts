@@ -1,4 +1,4 @@
-import { ExchangeId, MarketId } from './market';
+import { ExchangeId, MarketId } from './market.js';
 
 export interface NormalizedQuote {
   symbol: string;

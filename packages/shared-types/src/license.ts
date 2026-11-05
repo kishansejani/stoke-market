@@ -30,3 +30,4 @@ export interface LicenseValidationResult {
   hasDataAccess: boolean;
   daysRemainingData: number;
 }
+

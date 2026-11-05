@@ -22,3 +22,4 @@ export interface IMarketDataProvider {
   getNews(market?: 'IN' | 'US', symbol?: string, limit?: number): Promise<NewsArticle[]>;
   subscribeRealtime(symbols: string[], onTick: (tick: MarketTick) => void): () => void;
 }
+
