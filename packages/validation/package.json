@@ -1,0 +1,21 @@
+{
+  "name": "@stock-market/validation",
+  "version": "1.0.0",
+  "type": "module",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc -w",
+    "test": "tsc && node --test dist/__tests__/validation.test.js"
+  },
+  "dependencies": {
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@stock-market/shared-types": "*",
+    "@types/node": "^20.14.0",
+    "typescript": "^5.4.5"
+  }
+}

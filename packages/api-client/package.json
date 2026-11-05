@@ -1,0 +1,19 @@
+{
+  "name": "@stock-market/api-client",
+  "version": "1.0.0",
+  "type": "module",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc -w"
+  },
+  "dependencies": {
+    "@stock-market/shared-types": "*",
+    "socket.io-client": "^4.7.5"
+  },
+  "devDependencies": {
+    "typescript": "^5.4.5"
+  }
+}

@@ -1,0 +1,42 @@
+{
+  "name": "stock-market-platform",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Production-ready Global Stock Market Platform for Indian and US markets",
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
+  "scripts": {
+    "build": "npm run build --workspaces --if-present",
+    "test": "npm run test --workspaces --if-present",
+    "lint": "npm run lint --workspaces --if-present",
+    "dev:api": "npm --workspace=@stock-market/api run dev",
+    "dev:web": "npm --workspace=@stock-market/web run dev",
+    "dev:mobile": "npm --workspace=@stock-market/mobile run start",
+    "dev": "npm run dev:api",
+    "db:migrate": "npm --workspace=@stock-market/api run prisma:migrate",
+    "db:seed": "npm --workspace=@stock-market/api run prisma:seed",
+    "db:generate": "npm --workspace=@stock-market/api run prisma:generate"
+  },
+  "keywords": [
+    "stock-market",
+    "trading",
+    "nse",
+    "bse",
+    "nasdaq",
+    "nyse",
+    "finance",
+    "react",
+    "react-native",
+    "expo",
+    "nodejs",
+    "prisma",
+    "postgresql"
+  ],
+  "author": "Global Stock Market Platform Architects",
+  "license": "UNLICENSED",
+  "devDependencies": {
+    "@types/node": "^26.6.6"
+  }
+}

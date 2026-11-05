@@ -1,0 +1,467 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// ----------------- IDENTITY & ACCESS MANAGEMENT -----------------
+
+model User {
+  id              String        @id @default(uuid())
+  email           String        @unique
+  passwordHash    String
+  firstName       String
+  lastName        String
+  isEmailVerified Boolean       @default(false)
+  status          String        @default("ACTIVE") // ACTIVE, SUSPENDED, PENDING_VERIFICATION
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  profile         UserProfile?
+  sessions        UserSession[]
+  userRoles       UserRole[]
+  watchlists      Watchlist[]
+  priceAlerts     PriceAlert[]
+  notifications   Notification[]
+  orders          Order[]
+  licenses        License[]
+  auditLogs       AuditLog[]
+  adminLogs       AdminLog[]
+
+  @@map("users")
+}
+
+model UserProfile {
+  id                String   @id @default(uuid())
+  userId            String   @unique
+  theme             String   @default("DARK") // DARK, LIGHT, SYSTEM
+  preferredCurrency String   @default("INR") // INR, USD
+  defaultMarket     String   @default("IN") // IN, US, ALL
+  timezone          String   @default("Asia/Kolkata")
+  avatarUrl         String?
+  bio               String?
+  updatedAt         DateTime @updatedAt
+
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("user_profiles")
+}
+
+model UserSession {
+  id               String    @id @default(uuid())
+  userId           String
+  refreshTokenHash String
+  deviceInfo       String?
+  ipAddress        String?
+  expiresAt        DateTime
+  revokedAt        DateTime?
+  createdAt        DateTime  @default(now())
+
+  user             User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([refreshTokenHash])
+  @@map("user_sessions")
+}
+
+model Role {
+  id          String     @id @default(uuid())
+  name        String     @unique // SUPER_ADMIN, ADMIN, ANALYST, PRO_USER, FREE_USER
+  description String?
+  userRoles   UserRole[]
+  permissions Permission[]
+
+  @@map("roles")
+}
+
+model Permission {
+  id       String  @id @default(uuid())
+  roleId   String
+  action   String  // create, read, update, delete, manage
+  resource String  // quotes, watchlists, alerts, orders, licenses, admin
+
+  role     Role    @relation(fields: [roleId], references: [id], onDelete: Cascade)
+
+  @@map("permissions")
+}
+
+model UserRole {
+  id        String   @id @default(uuid())
+  userId    String
+  roleId    String
+  createdAt DateTime @default(now())
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role      Role     @relation(fields: [roleId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, roleId])
+  @@map("user_roles")
+}
+
+// ----------------- MARKETS & INSTRUMENTS -----------------
+
+model Market {
+  id                String       @id // "IN", "US"
+  name              String
+  currency          String       // "INR", "USD"
+  timezone          String       // "Asia/Kolkata", "America/New_York"
+  tradingHoursStart String       // "09:15"
+  tradingHoursEnd   String       // "15:30"
+  status            String       @default("CLOSED") // OPEN, CLOSED, PRE_MARKET, AFTER_HOURS
+
+  exchanges         Exchange[]
+  instruments       Instrument[]
+  marketNews        MarketNews[]
+
+  @@map("markets")
+}
+
+model Exchange {
+  id          String       @id // "NSE", "BSE", "NASDAQ", "NYSE"
+  marketId    String
+  name        String
+  country     String
+  website     String?
+
+  market      Market       @relation(fields: [marketId], references: [id], onDelete: Cascade)
+  instruments Instrument[]
+
+  @@map("exchanges")
+}
+
+model Instrument {
+  id           String            @id @default(uuid())
+  symbol       String            @unique // "RELIANCE.NS", "AAPL.US", "NIFTY50.IDX"
+  ticker       String            // "RELIANCE", "AAPL"
+  name         String
+  exchangeId   String
+  marketId     String
+  type         String            // "STOCK", "INDEX", "ETF"
+  currency     String            @default("INR") // "INR", "USD"
+  sector       String?
+  industry     String?
+  isin         String?
+  isActive     Boolean           @default(true)
+  createdAt    DateTime          @default(now())
+
+  exchange     Exchange          @relation(fields: [exchangeId], references: [id], onDelete: Cascade)
+  market       Market            @relation(fields: [marketId], references: [id], onDelete: Cascade)
+  quote        StockQuote?
+  history      HistoricalPrice[]
+  company      CompanyProfile?
+  watchlistItems WatchlistItem[]
+  priceAlerts  PriceAlert[]
+
+  @@index([ticker])
+  @@index([marketId])
+  @@index([exchangeId])
+  @@map("instruments")
+}
+
+model StockQuote {
+  id             String     @id @default(uuid())
+  instrumentId   String     @unique
+  price          Float
+  previousClose  Float
+  open           Float
+  high           Float
+  low            Float
+  volume         Float
+  change         Float
+  changePercent  Float
+  day52WeekHigh  Float?
+  day52WeekLow   Float?
+  marketCap      Float?
+  peRatio        Float?
+  isSimulated    Boolean    @default(false)
+  delayMinutes   Int        @default(0)
+  dataSource     String     @default("MOCK_ENGINE")
+  lastTradeAt    DateTime   @default(now())
+  updatedAt      DateTime   @updatedAt
+
+  instrument     Instrument @relation(fields: [instrumentId], references: [id], onDelete: Cascade)
+
+  @@map("stock_quotes")
+}
+
+model HistoricalPrice {
+  id           String     @id @default(uuid())
+  instrumentId String
+  timestamp    DateTime
+  open         Float
+  high         Float
+  low          Float
+  close        Float
+  volume       Float      @default(0)
+  timeframe    String     @default("1d") // 1m, 5m, 1h, 1d
+  isSimulated  Boolean    @default(false)
+
+  instrument   Instrument @relation(fields: [instrumentId], references: [id], onDelete: Cascade)
+
+  @@index([instrumentId, timestamp])
+  @@map("historical_prices")
+}
+
+// ----------------- USER ENGAGEMENT & ALERTS -----------------
+
+model Watchlist {
+  id        String          @id @default(uuid())
+  userId    String
+  name      String
+  isDefault Boolean         @default(false)
+  createdAt DateTime        @default(now())
+  updatedAt DateTime        @updatedAt
+
+  user      User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  items     WatchlistItem[]
+
+  @@map("watchlists")
+}
+
+model WatchlistItem {
+  id           String     @id @default(uuid())
+  watchlistId  String
+  instrumentId String
+  sortOrder    Int        @default(0)
+  addedAt      DateTime   @default(now())
+
+  watchlist    Watchlist  @relation(fields: [watchlistId], references: [id], onDelete: Cascade)
+  instrument   Instrument @relation(fields: [instrumentId], references: [id], onDelete: Cascade)
+
+  @@unique([watchlistId, instrumentId])
+  @@map("watchlist_items")
+}
+
+model PriceAlert {
+  id           String     @id @default(uuid())
+  userId       String
+  instrumentId String
+  condition    String     // ABOVE, BELOW, PCT_CHANGE_UP, PCT_CHANGE_DOWN
+  targetPrice  Float
+  triggered    Boolean    @default(false)
+  triggeredAt  DateTime?
+  isActive     Boolean    @default(true)
+  createdAt    DateTime   @default(now())
+
+  user         User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  instrument   Instrument @relation(fields: [instrumentId], references: [id], onDelete: Cascade)
+
+  @@map("price_alerts")
+}
+
+model Notification {
+  id        String   @id @default(uuid())
+  userId    String
+  title     String
+  body      String
+  type      String   // ALERT, SYSTEM, ORDER, LICENSE
+  read      Boolean  @default(false)
+  metadata  String?  // JSON serialized string
+  createdAt DateTime @default(now())
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("notifications")
+}
+
+// ----------------- FUNDAMENTALS & INTELLIGENCE -----------------
+
+model CompanyProfile {
+  id           String             @id @default(uuid())
+  instrumentId String             @unique
+  description  String
+  sector       String
+  industry     String
+  ceo          String
+  employees    Int
+  headquarters String
+  website      String
+  foundedYear  Int?
+  isin         String?
+
+  instrument   Instrument         @relation(fields: [instrumentId], references: [id], onDelete: Cascade)
+  financials   CompanyFinancial[]
+
+  @@map("company_profiles")
+}
+
+model CompanyFinancial {
+  id               String         @id @default(uuid())
+  companyProfileId String
+  fiscalYear       Int
+  fiscalQuarter    Int?           // 1, 2, 3, 4, or null for annual
+  periodEndDate    DateTime
+  revenue          Float
+  netIncome        Float
+  operatingIncome  Float?
+  eps              Float
+  ebitda           Float?
+  totalAssets      Float?
+  totalLiabilities Float?
+  totalEquity      Float?
+  operatingCashFlow Float?
+  freeCashFlow     Float?
+  peRatio          Float?
+  pbRatio          Float?
+  debtToEquity     Float?
+  dividendYield    Float?
+
+  companyProfile   CompanyProfile @relation(fields: [companyProfileId], references: [id], onDelete: Cascade)
+
+  @@map("company_financials")
+}
+
+model MarketNews {
+  id             String    @id @default(uuid())
+  marketId       String
+  title          String
+  summary        String
+  content        String?
+  source         String
+  url            String
+  imageUrl       String?
+  publishedAt    DateTime  @default(now())
+  sentiment      String?   // BULLISH, BEARISH, NEUTRAL
+  relatedSymbols String    // Comma-separated or JSON list of symbols
+
+  market         Market    @relation(fields: [marketId], references: [id], onDelete: Cascade)
+
+  @@map("market_news")
+}
+
+// ----------------- DATA ENGINE & PROVIDERS -----------------
+
+model DataProvider {
+  id          String           @id @default(uuid())
+  name        String
+  code        String           @unique // MOCK, POLYGON, NSE_LICENSED, ALPHAVANTAGE
+  isActive    Boolean          @default(true)
+  isMock      Boolean          @default(false)
+  quotaLimit  Int              @default(100000)
+  quotaUsed   Int              @default(0)
+  createdAt   DateTime         @default(now())
+
+  statusLogs  ProviderStatus[]
+
+  @@map("data_providers")
+}
+
+model ProviderStatus {
+  id             String       @id @default(uuid())
+  dataProviderId String
+  status         String       // ONLINE, DEGRADED, OFFLINE
+  latencyMs      Int
+  checkedAt      DateTime     @default(now())
+  details        String?
+
+  dataProvider   DataProvider @relation(fields: [dataProviderId], references: [id], onDelete: Cascade)
+
+  @@map("provider_status")
+}
+
+// ----------------- COMMERCE & LICENSING -----------------
+
+model Product {
+  id               String   @id @default(uuid())
+  slug             String   @unique // "pro-terminal-lifetime", "enterprise-terminal-lifetime"
+  name             String
+  tagline          String
+  description      String
+  priceINR         Int      // In paise: 1499900 = Rs 14,999
+  priceUSD         Int      // In cents: 19900 = $199
+  maxActivations   Int      @default(3)
+  dataIncludedDays Int      @default(365)
+  features         String   // JSON string array of features
+  isActive         Boolean  @default(true)
+  createdAt        DateTime @default(now())
+
+  orders           Order[]
+
+  @@map("products")
+}
+
+model Order {
+  id          String    @id @default(uuid())
+  orderNumber String    @unique
+  userId      String
+  productId   String
+  currency    String    // INR, USD
+  amount      Int
+  tax         Int       @default(0)
+  status      String    @default("PENDING") // PENDING, COMPLETED, FAILED, REFUNDED
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  product     Product   @relation(fields: [productId], references: [id], onDelete: Cascade)
+  payment     Payment?
+  license     License?
+
+  @@map("orders")
+}
+
+model Payment {
+  id                String    @id @default(uuid())
+  orderId           String    @unique
+  gateway           String    // RAZORPAY, STRIPE, MANUAL_INVOICE, MOCK_SANDBOX
+  gatewayPaymentId  String?
+  gatewaySignature  String?
+  status            String    @default("PENDING") // SUCCESS, PENDING, FAILED
+  metadata          String?   // JSON string
+  paidAt            DateTime?
+
+  order             Order     @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@map("payments")
+}
+
+model License {
+  id                   String    @id @default(uuid())
+  licenseKey           String    @unique // STK-PRO-8712-4412-9982
+  orderId              String    @unique
+  userId               String
+  status               String    @default("ACTIVE") // ACTIVE, SUSPENDED, EXPIRED, REVOKED
+  maxDevices           Int       @default(3)
+  activeDevices        String    @default("[]") // JSON string of activations
+  dataAccessExpiry     DateTime
+  softwareAccessExpiry DateTime?
+  signature            String    // HMAC SHA-256
+  createdAt            DateTime  @default(now())
+  updatedAt            DateTime  @updatedAt
+
+  order                Order     @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  user                 User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("licenses")
+}
+
+// ----------------- AUDITING & ADMIN LOGS -----------------
+
+model AdminLog {
+  id        String   @id @default(uuid())
+  userId    String
+  action    String
+  resource  String
+  payload   String?
+  createdAt DateTime @default(now())
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("admin_logs")
+}
+
+model AuditLog {
+  id        String   @id @default(uuid())
+  userId    String?
+  action    String
+  ipAddress String?
+  userAgent String?
+  payload   String?
+  createdAt DateTime @default(now())
+
+  user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@map("audit_logs")
+}
