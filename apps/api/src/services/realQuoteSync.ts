@@ -118,3 +118,4 @@ export async function syncAllRealMarketQuotes() {
 
   console.log('[RealQuoteSync] Real market prices successfully synchronized!');
 }
+
