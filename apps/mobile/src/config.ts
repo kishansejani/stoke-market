@@ -5,9 +5,8 @@
  */
 export const API_BASE_URL =
   process.env.EXPO_PUBLIC_API_URL ||
-  'https://stock-market-api.onrender.com/api/v1';
+  'https://stock-market-api-1wo1.onrender.com/api/v1';
 
 export const WS_BASE_URL =
   process.env.EXPO_PUBLIC_WS_URL ||
-  'https://stock-market-api.onrender.com';
-
+  'https://stock-market-api-1wo1.onrender.com';
