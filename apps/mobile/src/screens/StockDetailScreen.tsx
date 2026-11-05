@@ -8,6 +8,7 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { theme } from '../theme';
+import { API_BASE_URL } from '../config';
 import { formatCurrency, formatPercentage } from '@stock-market/shared-utils';
 import { NormalizedQuote } from '@stock-market/shared-types';
 
@@ -23,7 +24,7 @@ export const StockDetailScreen: React.FC<StockDetailScreenProps> = ({ symbol, on
   useEffect(() => {
     async function load() {
       try {
-        const res = await fetch(`http://localhost:5000/api/v1/stocks/${encodeURIComponent(symbol)}`);
+        const res = await fetch(`${API_BASE_URL}/stocks/${encodeURIComponent(symbol)}`);
         const json = await res.json();
         if (json.success) {
           setQuote(json.data);

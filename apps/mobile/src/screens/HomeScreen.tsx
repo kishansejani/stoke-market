@@ -9,6 +9,7 @@ import {
   RefreshControl,
 } from 'react-native';
 import { theme } from '../theme';
+import { API_BASE_URL } from '../config';
 import { formatCurrency, formatPercentage } from '@stock-market/shared-utils';
 import { IndexSummary } from '@stock-market/shared-types';
 
@@ -106,7 +107,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectStock }) => {
 
   const loadData = async () => {
     try {
-      const res = await fetch(`http://localhost:5000/api/v1/markets/${activeMarket}/summary`);
+      const res = await fetch(`${API_BASE_URL}/markets/${activeMarket}/summary`);
       const json = await res.json();
       if (json.success && json.data.length > 0) {
         setIndices(json.data);

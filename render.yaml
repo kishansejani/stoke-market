@@ -1,0 +1,24 @@
+services:
+  - type: web
+    name: stock-market-api
+    runtime: node
+    plan: free
+    region: singapore
+    buildCommand: npm run build:packages && npm --workspace=@stock-market/api run build
+    startCommand: npm --workspace=@stock-market/api run start
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      - key: CORS_ORIGIN
+        value: "*"
+      - key: DATABASE_URL
+        sync: false
+      - key: JWT_ACCESS_SECRET
+        generateValue: true
+      - key: JWT_REFRESH_SECRET
+        generateValue: true
+      - key: LICENSE_HMAC_SECRET
+        generateValue: true

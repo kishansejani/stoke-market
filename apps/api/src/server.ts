@@ -54,10 +54,10 @@ async function bootstrap() {
     console.log('[Server] Starting Market Engine & Provider Adapters...');
     await marketEngine.start();
 
-    server.listen(config.port, () => {
+    server.listen(config.port, '0.0.0.0', () => {
       console.log(`====================================================`);
       console.log(`🚀 GLOBAL STOCK MARKET API SERVER RUNNING`);
-      console.log(`📡 URL: http://localhost:${config.port}`);
+      console.log(`📡 URL: http://0.0.0.0:${config.port}`);
       console.log(`🔗 REST Base: http://localhost:${config.port}/api/v1`);
       console.log(`⚡ WebSocket: ws://localhost:${config.port}`);
       console.log(`🛠️  Environment: ${config.env}`);

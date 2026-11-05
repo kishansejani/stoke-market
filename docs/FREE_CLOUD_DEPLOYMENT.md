@@ -102,3 +102,4 @@ Vercel પર તમારા React + Tailwind + TradingView ફ્રન્ટ�
 - **GMP (Grey Market Premium)**: લાઈવ GMP અને Expected Listing Gain ટકાવારી.
 - **Profit Calculator**: એપ્લીકેશન લોટ સાઈઝ (1 Lot, 2 Lots, 5 Lots) પસંદ કરીને રોકાણ અને અંદાજિત લિસ્ટિંગ નફો (Profit per Lot) ગણી શકાય છે.
 - **સબસ્ક્રિપ્શન સ્ટેટસ**: QIB, NII, Retail અને Total સબસ્ક્રિપ્શન મલ્ટિપલ બાર્સ.
+
