@@ -6,6 +6,7 @@ export async function getIPOs(req: Request, res: Response): Promise<void> {
     const marketId = (req.query.marketId as string) || undefined;
     const status = (req.query.status as string) || undefined;
     const category = (req.query.category as string) || undefined;
+    const q = (req.query.q as string)?.trim();
 
     const where: any = {};
     if (marketId && marketId !== 'ALL') {
@@ -16,6 +17,12 @@ export async function getIPOs(req: Request, res: Response): Promise<void> {
     }
     if (category) {
       where.category = category.toUpperCase();
+    }
+    if (q) {
+      where.OR = [
+        { companyName: { contains: q, mode: 'insensitive' } },
+        { symbol: { contains: q, mode: 'insensitive' } },
+      ];
     }
 
     const ipos = await prisma.iPO.findMany({

@@ -214,10 +214,11 @@ export class ApiClient {
   }
 
   // IPOs
-  async getIPOs(market?: 'IN' | 'US', status?: string): Promise<IPOItem[]> {
+  async getIPOs(market?: 'IN' | 'US', status?: string, q?: string): Promise<IPOItem[]> {
     const params = new URLSearchParams();
     if (market) params.append('market', market);
     if (status) params.append('status', status);
+    if (q) params.append('q', q);
     return this.request<IPOItem[]>(`/ipos?${params.toString()}`);
   }
 

@@ -12,6 +12,7 @@ import {
   CheckCircle2,
   AlertCircle,
   BarChart3,
+  Search,
 } from 'lucide-react';
 import { api } from '../lib/api';
 import { useMarketStore } from '../store/marketStore';
@@ -25,6 +26,7 @@ export const IpoPage: React.FC = () => {
   const [selectedStatus, setSelectedStatus] = useState<string>('ALL');
   const [selectedIpo, setSelectedIpo] = useState<IPOItem | null>(null);
   const [calcLots, setCalcLots] = useState<number>(1);
+  const [searchQuery, setSearchQuery] = useState<string>('');
 
   useEffect(() => {
     async function loadIPOs() {
@@ -46,6 +48,18 @@ export const IpoPage: React.FC = () => {
     }
     loadIPOs();
   }, [activeMarket, selectedStatus]);
+
+  // Instant real-time search filtering across company name, ticker/symbol, and exchange
+  const filteredIpos = ipos.filter((ipo) => {
+    if (!searchQuery.trim()) return true;
+    const q = searchQuery.toLowerCase().trim();
+    return (
+      ipo.companyName.toLowerCase().includes(q) ||
+      (ipo.symbol && ipo.symbol.toLowerCase().includes(q)) ||
+      ipo.exchange.toLowerCase().includes(q) ||
+      (ipo.description && ipo.description.toLowerCase().includes(q))
+    );
+  });
 
   const formatDate = (dateStr?: string | Date) => {
     if (!dateStr) return 'TBA';
@@ -131,6 +145,40 @@ export const IpoPage: React.FC = () => {
         </div>
       </div>
 
+      {/* Live IPO Search Bar */}
+      <div className="relative">
+        <Search className="w-4 h-4 text-slate-400 absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none" />
+        <input
+          type="text"
+          value={searchQuery}
+          onChange={(e) => {
+            const val = e.target.value;
+            setSearchQuery(val);
+            if (val.trim()) {
+              const matched = ipos.find((ipo) =>
+                ipo.companyName.toLowerCase().includes(val.toLowerCase()) ||
+                (ipo.symbol && ipo.symbol.toLowerCase().includes(val.toLowerCase()))
+              );
+              if (matched) setSelectedIpo(matched);
+            }
+          }}
+          placeholder="Search IPO by company or symbol (e.g. BLS, Swiggy, Waaree, NTPC, BlackBuck, Sagility)..."
+          className="w-full bg-[#151F30] border border-[#1E293B] rounded-xl pl-11 pr-24 py-3 text-sm text-white placeholder-slate-400 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all shadow-inner"
+        />
+        {searchQuery ? (
+          <button
+            onClick={() => setSearchQuery('')}
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-slate-400 hover:text-white px-2 py-1 rounded bg-[#0B1220] border border-[#1E293B]"
+          >
+            Clear ✕
+          </button>
+        ) : (
+          <span className="absolute right-3.5 top-1/2 -translate-y-1/2 text-[10px] font-mono text-slate-500 bg-[#0B1220] px-2 py-0.5 rounded border border-[#1E293B]">
+            MAINBOARD & SME
+          </span>
+        )}
+      </div>
+
       {/* Filter Tabs */}
       <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[#1E293B] pb-3">
         <div className="flex items-center gap-2">
@@ -156,7 +204,7 @@ export const IpoPage: React.FC = () => {
         </div>
 
         <div className="text-xs text-slate-400">
-          Showing <span className="text-white font-semibold">{ipos.length}</span> issues
+          Showing <span className="text-white font-semibold">{filteredIpos.length}</span> issues
         </div>
       </div>
 
@@ -170,16 +218,16 @@ export const IpoPage: React.FC = () => {
                 <div key={n} className="h-44 rounded-2xl bg-[#151F30] animate-pulse border border-[#1E293B]" />
               ))}
             </div>
-          ) : ipos.length === 0 ? (
+          ) : filteredIpos.length === 0 ? (
             <div className="p-12 text-center rounded-2xl bg-[#151F30] border border-[#1E293B]">
               <AlertCircle className="w-10 h-10 text-slate-500 mx-auto mb-3" />
               <h3 className="text-sm font-semibold text-white">No IPOs Found</h3>
               <p className="text-xs text-slate-400 mt-1">
-                There are no offerings matching your current filter in the selected market.
+                There are no offerings matching "{searchQuery}" in the selected market.
               </p>
             </div>
           ) : (
-            ipos.map((ipo) => {
+            filteredIpos.map((ipo) => {
               const currency = ipo.marketId === 'IN' ? 'INR' : 'USD';
               const symPrefix = ipo.marketId === 'IN' ? '₹' : '$';
               const isSelected = selectedIpo?.id === ipo.id;

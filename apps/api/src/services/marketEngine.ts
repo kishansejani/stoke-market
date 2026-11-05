@@ -1,6 +1,7 @@
-import { providerManager } from '../providers';
-import { prisma } from '../models/prisma';
+import { providerManager } from '../providers/index.js';
+import { prisma } from '../models/prisma.js';
 import { MarketTick, NormalizedQuote } from '@stock-market/shared-types';
+import { syncAllRealMarketQuotes } from './realQuoteSync.js';
 
 export class MarketEngine {
   private static instance: MarketEngine;
@@ -16,6 +17,13 @@ export class MarketEngine {
   }
 
   async start(): Promise<void> {
+    // 1. Fetch real exchange market data asynchronously
+    syncAllRealMarketQuotes().catch((e) => console.error('[MarketEngine] Quote sync err:', e));
+    // Repeat quote sync every 5 minutes
+    setInterval(() => {
+      syncAllRealMarketQuotes().catch((e) => console.error('[MarketEngine] Periodic sync err:', e));
+    }, 5 * 60 * 1000).unref();
+
     await providerManager.initialize();
 
     // Subscribe to all seeded symbols for real-time tick generation & alert evaluation
